@@ -48,11 +48,6 @@ public class GameController : MonoBehaviour {
         {
             MainMode();
         }
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Findpath();
-        }
     }
 
     public void GenerateNewMap()
@@ -68,13 +63,15 @@ public class GameController : MonoBehaviour {
             int size = int.Parse(input_size.GetComponent<InputField>().text);
             int obstacles = int.Parse(input_obstacles.GetComponent<InputField>().text);
 
-            if (size >= 10)
-                map.GetComponent<Map>().GenerateNewMap(size, obstacles);
+            if ((0.5f * (size * size) >= obstacles))
+            {
+                if (size >= 10)
+                    map.GetComponent<Map>().GenerateNewMap(size, obstacles);
+                else
+                    EditorUtility.DisplayDialog("Error", "Minimalny rozmiar mapy to 10x10!", "Kurde!");
+            }
             else
-                EditorUtility.DisplayDialog("Error", "Minimalny rozmiar mapy to 10x10!", "Kurde!");
-
-
-
+                EditorUtility.DisplayDialog("Error", "Za duzo obstacli!", "Kurde!");
         }
         catch (System.FormatException exception)
         {
@@ -127,7 +124,14 @@ public class GameController : MonoBehaviour {
 
         if (map != null)
         {
-            map.GetComponent<Map>().Findpath(pathfinder);
+            if (GameObject.Find("Dropdown").GetComponentInChildren<Text>().text == "A*")
+                pathfinder = new AstarPathfinding();
+            else if (GameObject.Find("Dropdown").GetComponentInChildren<Text>().text == "BFS")
+                pathfinder = new BFSPathfinding();
+
+
+
+                map.GetComponent<Map>().Findpath(pathfinder);
         }
     }
 

@@ -12,10 +12,12 @@ public class Map : MonoBehaviour {
     public GameObject tile_prefab;
     private GameObject[] tiles;
     private List<int> obstacles;
+    private List<int> last_path;
 
 	void Start ()
     {
         obstacles = new List<int>();
+        last_path = new List<int>();
     }
 
     public void GenerateNewMap(int new_map_size, int obstacle_number)
@@ -99,16 +101,25 @@ public class Map : MonoBehaviour {
 
     public void Findpath(IPathfinding pathfinder)
     {
-        ColorPathTiles(pathfinder.GetPath(a, b, tiles, map_size, obstacles));
+        List<int> path = pathfinder.GetPath(a, b, tiles, map_size, obstacles);
+        ColorPathTiles(path);
+        last_path = path;
     }
 
     private void ColorPathTiles(List<int> path)
     {
+        foreach (int current in last_path)
+        {
+            if (current != a && current != b)
+                tiles[current].GetComponent<SpriteRenderer>().color = Color.white;
+        }
         foreach (int current in path)
         {
             if ( current != a && current != b)
                 tiles[current].GetComponent<SpriteRenderer>().color = Color.red;
         }
+
+        
     }
 
     public void SaveMapToFile(string filename)
