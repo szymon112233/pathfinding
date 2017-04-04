@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour {
 
-    private bool is_obstacle;
-	// Use this for initialization
-	void Start () {
+    public bool is_obstacle;
+
+	void Awake () {
         is_obstacle = false;
 	}
 	
@@ -15,11 +15,11 @@ public class Tile : MonoBehaviour {
 		
 	}
 
-    bool IsObstacle()
+    public bool IsObstacle()
     {
         return is_obstacle;
     }
-    void SetObstacle(bool value)
+    public void SetObstacle(bool value)
     {
         is_obstacle = value;
     }

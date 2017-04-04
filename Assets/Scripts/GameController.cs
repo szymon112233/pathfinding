@@ -9,10 +9,14 @@ public class GameController : MonoBehaviour {
 
     public float camera_move_speed = 50.0f;
     public float camera_zoom_speed = 50.0f;
-    private
+
+    private GameObject main_panel;
+    private GameObject gen_panel;
     // Use this for initialization
     void Start () {
-        
+        main_panel = GameObject.Find("MainPanel");
+        gen_panel = GameObject.Find("GenPanel");
+        gen_panel.SetActive(false);
 	}
 	
 	// Update is called once per frame
@@ -27,12 +31,31 @@ public class GameController : MonoBehaviour {
             main_camera.transform.Translate(new Vector3(0, Time.deltaTime * camera_move_speed, 0));
         if (Input.GetKey(KeyCode.DownArrow))
             main_camera.transform.Translate(new Vector3(0, Time.deltaTime * -camera_move_speed, 0));
+
+        if (Input.GetMouseButton(1))
+        {
+            main_camera.transform.Translate(new Vector3(Time.deltaTime * camera_move_speed * Input.GetAxis("Horizontal"), Time.deltaTime * camera_move_speed * Input.GetAxis("Vertical"), 0));
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            main_panel.SetActive(true);
+            gen_panel.SetActive(false);
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            GameObject map = GameObject.Find("Map");
+
+            if (map != null)
+            {
+                map.GetComponent<Map>().ColorPathTiles(map.GetComponent<Map>().Astar(map.GetComponent<Map>().a, map.GetComponent<Map>().b));
+            }
+        }
     }
     public void GenerateMap()
     {
-        GameObject main_panel = GameObject.Find("MainPanel");
-        GameObject gen_panel = GameObject.Find("GenPanel");
-
+      
         main_panel.SetActive(false);
         gen_panel.SetActive(true);
 
@@ -40,12 +63,11 @@ public class GameController : MonoBehaviour {
 
     public void GenerateNewMap()
     {
-        GameObject gen_panel = GameObject.Find("GenPanel");
+        GameObject input_size = GameObject.Find("SizeInputField");
+        GameObject input_obstacles = GameObject.Find("ObstaclesInputField");
         GameObject map = GameObject.Find("Map");
 
-        map.GetComponent<Map>().GenerateNewMap(int.Parse(gen_panel.GetComponentInChildren<InputField>().text));
-       // gen_panel.SetActive(false);
-
+        map.GetComponent<Map>().GenerateNewMap(int.Parse(input_size.GetComponent<InputField>().text), int.Parse(input_obstacles.GetComponent<InputField>().text));
     }
 
     public void LoadMap()
