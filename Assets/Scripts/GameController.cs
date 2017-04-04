@@ -13,14 +13,20 @@ public class GameController : MonoBehaviour {
 
     private GameObject main_panel;
     private GameObject gen_panel;
-    // Use this for initialization
+    private GameObject pf_panel;
+
+    private IPathfinding pathfinder;
+
     void Start () {
         main_panel = GameObject.Find("MainPanel");
         gen_panel = GameObject.Find("GenPanel");
-        gen_panel.SetActive(false);
-	}
+        pf_panel = GameObject.Find("PathfindingPanel");
+
+        pathfinder = new BFSPathfinding();
+        MainMode();
+
+    }
 	
-	// Update is called once per frame
 	void Update () {
         Camera.main.orthographicSize += Time.deltaTime * -Input.mouseScrollDelta.y * camera_zoom_speed;
 
@@ -40,26 +46,13 @@ public class GameController : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            main_panel.SetActive(true);
-            gen_panel.SetActive(false);
+            MainMode();
         }
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            GameObject map = GameObject.Find("Map");
-
-            if (map != null)
-            {
-                map.GetComponent<Map>().ColorPathTiles(map.GetComponent<Map>().Astar(map.GetComponent<Map>().a, map.GetComponent<Map>().b));
-            }
+            Findpath();
         }
-    }
-    public void GenerateMap()
-    {
-      
-        main_panel.SetActive(false);
-        gen_panel.SetActive(true);
-
     }
 
     public void GenerateNewMap()
@@ -75,7 +68,12 @@ public class GameController : MonoBehaviour {
             int size = int.Parse(input_size.GetComponent<InputField>().text);
             int obstacles = int.Parse(input_obstacles.GetComponent<InputField>().text);
 
-            map.GetComponent<Map>().GenerateNewMap(size, obstacles);
+            if (size >= 10)
+                map.GetComponent<Map>().GenerateNewMap(size, obstacles);
+            else
+                EditorUtility.DisplayDialog("Error", "Minimalny rozmiar mapy to 10x10!", "Kurde!");
+
+
 
         }
         catch (System.FormatException exception)
@@ -96,9 +94,41 @@ public class GameController : MonoBehaviour {
         map.GetComponent<Map>().SaveMapToFile(EditorUtility.SaveFilePanel("Save generated map", "/", "map", "txt"));
     }
 
+    public void MainMode()
+    {
+        main_panel.SetActive(true);
+        pf_panel.SetActive(false);
+        gen_panel.SetActive(false);
+    }
+
+    public void GeneratingMode()
+    {
+        main_panel.SetActive(false);
+        pf_panel.SetActive(false);
+        gen_panel.SetActive(true);
+    }
+
+    public void PathfindingMode()
+    {
+        main_panel.SetActive(false);
+        gen_panel.SetActive(false);
+        pf_panel.SetActive(true);
+    }
+
     public void Exit()
     {
         Debug.Log("Exiting game...");
         Application.Quit();
     }
+
+    public void Findpath()
+    {
+        GameObject map = GameObject.Find("Map");
+
+        if (map != null)
+        {
+            map.GetComponent<Map>().Findpath(pathfinder);
+        }
+    }
+
 }

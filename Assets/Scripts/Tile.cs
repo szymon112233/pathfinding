@@ -4,15 +4,10 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour {
 
-    public bool is_obstacle;
+    private bool is_obstacle;
 
 	void Awake () {
         is_obstacle = false;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 
     public bool IsObstacle()
