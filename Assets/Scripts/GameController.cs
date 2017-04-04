@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class GameController : MonoBehaviour {
 
@@ -67,11 +68,32 @@ public class GameController : MonoBehaviour {
         GameObject input_obstacles = GameObject.Find("ObstaclesInputField");
         GameObject map = GameObject.Find("Map");
 
-        map.GetComponent<Map>().GenerateNewMap(int.Parse(input_size.GetComponent<InputField>().text), int.Parse(input_obstacles.GetComponent<InputField>().text));
+       
+
+        try
+        {
+            int size = int.Parse(input_size.GetComponent<InputField>().text);
+            int obstacles = int.Parse(input_obstacles.GetComponent<InputField>().text);
+
+            map.GetComponent<Map>().GenerateNewMap(size, obstacles);
+
+        }
+        catch (System.FormatException exception)
+        {
+            EditorUtility.DisplayDialog("Error", "Zle wartości w polu Map size  i/lub Obstacles count", "Kurde!");
+        }
     }
 
     public void LoadMap()
     {
+        GameObject map = GameObject.Find("Map");
+        map.GetComponent<Map>().LoadMapFromFile(EditorUtility.OpenFilePanel("Load generated map", "/", "txt"));
+    }
+
+    public void SaveMap()
+    {
+        GameObject map = GameObject.Find("Map");
+        map.GetComponent<Map>().SaveMapToFile(EditorUtility.SaveFilePanel("Save generated map", "/", "map", "txt"));
     }
 
     public void Exit()

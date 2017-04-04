@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+
 
 public class Map : MonoBehaviour {
 
@@ -9,10 +11,11 @@ public class Map : MonoBehaviour {
     public int a, b;
     public GameObject tile_prefab;
     private GameObject[] tiles;
+    private List<int> obstacles;
 
 	// Use this for initialization
 	void Start () {
-        GenerateNewMap(map_size, 10);
+        obstacles = new List<int>();
     }
     public void GenerateNewMap(int new_map_size, int obstacle_number)
     {
@@ -31,12 +34,17 @@ public class Map : MonoBehaviour {
 
         int tmp_target = Random.Range(0, map_size * map_size - 1);
 
+        obstacles.Clear();
         for(int i = 0; i<obstacle_number; i++)
         {
+            
             tmp_target = Random.Range(0, map_size * map_size - 1);
             tiles[tmp_target].GetComponent<Tile>().is_obstacle = true;
+            if (!obstacles.Contains(tmp_target))
+                obstacles.Add(tmp_target);
         }
-        
+        Debug.Log(obstacles.Count);
+
         while (tiles[tmp_target].GetComponent<Tile>().IsObstacle())
             tmp_target = Random.Range(0, map_size * map_size - 1);
         a = tmp_target;
@@ -155,5 +163,73 @@ public class Map : MonoBehaviour {
         }
 
         return path;
+    }
+
+    public void SaveMapToFile(string filename)
+    {
+        StreamWriter file = File.CreateText(filename);
+
+        file.WriteLine(map_size + " " + tile_size + " " + a + " " + b);
+        int saved_obstacles = 0;
+        foreach (int obstacle in obstacles)
+        {
+            file.Write(obstacle + " ");
+            saved_obstacles++;
+        }
+        file.Close();
+        Debug.Log("Saved obstacles:" + saved_obstacles);
+        Debug.Log("Saving map to :" + filename);
+    }
+
+    public void LoadMapFromFile(string filename)
+    {
+
+        Debug.Log("Loading map from :" + filename);
+        StreamReader file = File.OpenText(filename);
+
+        string line = "";
+        line = file.ReadLine();
+        Debug.Log(line);
+
+        string[] values = line.Split();
+
+        map_size = int.Parse(values[0]);
+        tile_size = int.Parse(values[1]);
+        a = int.Parse(values[2]);
+        b = int.Parse(values[3]);
+
+
+        if (tiles != null)
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                GameObject.Destroy(tiles[i]);
+            }
+        tiles = new GameObject[map_size * map_size];
+
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            tiles[i] = Instantiate(tile_prefab, new Vector3(i % map_size * tile_size, i / map_size * tile_size, 0), Quaternion.identity);
+        }
+
+        line = file.ReadLine();
+        values = line.Split(' ');
+
+
+        Debug.Log(values.Length + ": " + line);
+
+        obstacles.Clear();
+        foreach (string string_number in values)
+        {
+            if (string_number != "")
+            {
+                int number = int.Parse(string_number);
+                obstacles.Add(number);
+                tiles[number].GetComponent<Tile>().SetObstacle(true);
+            }
+            
+        }
+        ColorTiles();
+
+        file.Close();
     }
 }
