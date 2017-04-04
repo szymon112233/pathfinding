@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 
 public class GameController : MonoBehaviour {
 
@@ -16,6 +15,12 @@ public class GameController : MonoBehaviour {
     private GameObject pf_panel;
 
     private IPathfinding pathfinder;
+
+    private Rect windowRect = new Rect((Screen.width - 300) / 2, (Screen.height - 200) / 2, 300, 200);
+    private bool show_error = false;
+    private bool show_dialog = false;
+    private string error_message;
+    string filename = "map.txt";
 
     void Start () {
         main_panel = GameObject.Find("MainPanel");
@@ -68,27 +73,35 @@ public class GameController : MonoBehaviour {
                 if (size >= 10)
                     map.GetComponent<Map>().GenerateNewMap(size, obstacles);
                 else
-                    EditorUtility.DisplayDialog("Error", "Minimalny rozmiar mapy to 10x10!", "Kurde!");
+                {
+                    error_message = "Minimalny rozmiar mapy to 10x10!";
+                    OpenError();
+                }
+                    
             }
             else
-                EditorUtility.DisplayDialog("Error", "Za duzo obstacli!", "Kurde!");
+            {
+                error_message = "Za duzo obstacli!";
+                OpenError();
+            }
         }
         catch (System.FormatException exception)
         {
-            EditorUtility.DisplayDialog("Error", "Zle wartości w polu Map size  i/lub Obstacles count", "Kurde!");
+            error_message = "Zle wartości w polu Map size lub Obstacles count";
+            OpenError();
         }
     }
 
-    public void LoadMap()
+    public void LoadMap(string filename)
     {
         GameObject map = GameObject.Find("Map");
-        map.GetComponent<Map>().LoadMapFromFile(EditorUtility.OpenFilePanel("Load generated map", "/", "txt"));
+        map.GetComponent<Map>().LoadMapFromFile(filename);
     }
 
-    public void SaveMap()
+    public void SaveMap(string filename)
     {
         GameObject map = GameObject.Find("Map");
-        map.GetComponent<Map>().SaveMapToFile(EditorUtility.SaveFilePanel("Save generated map", "/", "map", "txt"));
+        map.GetComponent<Map>().SaveMapToFile(filename);
     }
 
     public void MainMode()
@@ -114,7 +127,6 @@ public class GameController : MonoBehaviour {
 
     public void Exit()
     {
-        Debug.Log("Exiting game...");
         Application.Quit();
     }
 
@@ -129,10 +141,56 @@ public class GameController : MonoBehaviour {
             else if (GameObject.Find("Dropdown").GetComponentInChildren<Text>().text == "BFS")
                 pathfinder = new BFSPathfinding();
 
-
-
                 map.GetComponent<Map>().Findpath(pathfinder);
         }
+    }
+
+    void OnGUI()
+    {
+        if (show_error)
+            windowRect = GUI.Window(0, windowRect, ErrorWindow, "Error");
+        if (show_dialog)
+            windowRect = GUI.Window(0, windowRect, DialogWindow, "Save/Open Dialog");
+    }
+
+    void ErrorWindow(int windowID)
+    {
+        float y = 20;
+        GUI.Label(new Rect(5, y, windowRect.width, 20), error_message);
+
+        if (GUI.Button(new Rect(5, y + 20, windowRect.width - 10, 20), "Kurde!"))
+        {
+            show_error = false;
+        }
+    }
+
+    void DialogWindow(int windowID)
+    {
+        GUI.Label(new Rect(5, 20, windowRect.width, 20), "Wpisz nazwe pliku:");
+        
+        filename = GUI.TextField(new Rect(5, 50, windowRect.width, 20), filename);
+
+        if (GUI.Button(new Rect(5, 80, windowRect.width - 10, 20), "Save"))
+        {
+            SaveMap(filename);
+            show_dialog = false;
+        }
+
+        if (GUI.Button(new Rect(5, 100, windowRect.width - 10, 20), "Load"))
+        {
+            LoadMap(filename);
+            show_dialog = false;
+        }
+    }
+
+    public void OpenError()
+    {
+        show_error = true;
+    }
+
+    public void OpenDialog()
+    {
+        show_dialog = true;
     }
 
 }
