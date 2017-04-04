@@ -40,22 +40,44 @@ public class Map : MonoBehaviour {
 
         // Randomly place obstacles
         obstacles.Clear();
-        for(int i = 0; i<obstacle_number; i++)
+        do
         {   
             tmp_target = Random.Range(0, map_size * map_size - 1);
             tiles[tmp_target].GetComponent<Tile>().SetObstacle(true);
             if (!obstacles.Contains(tmp_target))
+            {
+                // Wylosuj rozmiar
+                int x = Random.Range(0, 2);
+                int y = Random.Range(0, 2);
+
                 obstacles.Add(tmp_target);
-        }
+                if (tmp_target % map_size != map_size - 1)
+                    if (!obstacles.Contains(tmp_target + x))
+                    obstacles.Add(tmp_target + x);
+                if (tmp_target + map_size < map_size * map_size)
+                    if (!obstacles.Contains(tmp_target + y * map_size))
+                        obstacles.Add(tmp_target + y * map_size);
+
+                if (x + y == 2)
+                {
+                    if (tmp_target % map_size != map_size - 1 && tmp_target + map_size < map_size * map_size)
+                        if (!obstacles.Contains(tmp_target + x + y * map_size))
+                            obstacles.Add(tmp_target + x + y * map_size);
+                }
+
+                obstacle_number--;
+            }
+                
+        } while (obstacle_number > 0);
 
 
         // Randomly place start and finish point
-        while (tiles[tmp_target].GetComponent<Tile>().IsObstacle())
+        while (obstacles.Contains(tmp_target))
             tmp_target = Random.Range(0, map_size * map_size - 1);
         a = tmp_target;
 
         tmp_target = Random.Range(0, map_size * map_size - 1);
-        while (tiles[tmp_target].GetComponent<Tile>().IsObstacle() || tmp_target == a)
+        while (obstacles.Contains(tmp_target) || tmp_target == a)
             tmp_target = Random.Range(0, map_size * map_size - 1);
         b = tmp_target;
 
@@ -69,10 +91,9 @@ public class Map : MonoBehaviour {
         tiles[a].GetComponent<SpriteRenderer>().color = Color.green;
         tiles[b].GetComponent<SpriteRenderer>().color = Color.blue;
 
-        foreach (GameObject tile in tiles)
+        foreach (int tile in obstacles)
         {
-            if (tile.GetComponent<Tile>().IsObstacle())
-                tile.GetComponent<SpriteRenderer>().color = Color.black;
+                tiles[tile].GetComponent<SpriteRenderer>().color = Color.black;
         }
     }
 

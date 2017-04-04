@@ -18,7 +18,6 @@ public class BFSPathfinding : IPathfinding {
         {
             
             int current = tiles_queue.Dequeue();
-            Debug.Log("Checking tile: " + current);
 
             if (current == finish)
                 return GetParentsPath(parents, current);
