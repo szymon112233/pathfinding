@@ -7,9 +7,15 @@ public class DialogController : MonoBehaviour {
     private Rect windowRect = new Rect((Screen.width - 300) / 2, (Screen.height - 200) / 2, 300, 200);
     private bool show_error = false;
     private bool show_dialog = false;
-    private string error_message;
-    string filename = "map.txt";
+    private string error_message = "";
+    private string filename = "map.txt";
 
+    private GameController main_control;
+
+    private void Awake()
+    {
+        main_control = GameObject.Find("Controller").GetComponent<GameController>();
+    }
 
     void OnGUI()
     {
@@ -38,13 +44,13 @@ public class DialogController : MonoBehaviour {
 
         if (GUI.Button(new Rect(5, 80, windowRect.width - 10, 20), "Save"))
         {
-            SaveMap(filename);
+            main_control.SaveMap(filename);
             show_dialog = false;
         }
 
         if (GUI.Button(new Rect(5, 100, windowRect.width - 10, 20), "Load"))
         {
-            LoadMap(filename);
+            main_control.LoadMap(filename);
             show_dialog = false;
         }
 
@@ -65,4 +71,4 @@ public class DialogController : MonoBehaviour {
         show_dialog = true;
     }
 }
-}
+

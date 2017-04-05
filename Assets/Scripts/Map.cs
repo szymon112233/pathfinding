@@ -95,7 +95,7 @@ public class Map : MonoBehaviour {
 
         if (path.Count == 0)
         {
-            GameObject.Find("Controller").GetComponent<GameController>().OpenError("Unable to find a path");
+            GameObject.Find("DialogController").GetComponent<DialogController>().OpenError("Unable to find a path");
             return;
         }
         ColorPathTiles(path);
@@ -195,10 +195,9 @@ public class Map : MonoBehaviour {
         }
         catch(System.Exception)
         {
-            GameObject.Find("Controller").GetComponent<GameController>().OpenError("Unable to open the file!");
+            GameObject.Find("DialogController").GetComponent<DialogController>().OpenError("Unable to open the file!");
             Debug.Log("Nie udalo sie otworzyc pliku!");
             return;
-
         }
     }
 

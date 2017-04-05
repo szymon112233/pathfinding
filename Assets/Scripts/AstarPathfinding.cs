@@ -37,18 +37,14 @@ public class AstarPathfinding : IPathfinding {
 
             List<int> neighbors = new List<int>();
 
-            if (current - map_size > 0)
-                if (!obstacles.Contains(current - map_size))
-                    neighbors.Add(current - map_size);
-            if (current + map_size < map_size * map_size)
-                if (!obstacles.Contains(current + map_size))
-                    neighbors.Add(current + map_size);
-            if (current % map_size != 0)
-                if (!obstacles.Contains(current - 1))
-                    neighbors.Add(current - 1);
-            if (current % map_size != map_size - 1)
-                if (!obstacles.Contains(current + 1))
-                    neighbors.Add(current + 1);
+            if (current - map_size > 0 && !obstacles.Contains(current - map_size))
+                neighbors.Add(current - map_size);
+            if (current + map_size < map_size * map_size && !obstacles.Contains(current + map_size))
+                neighbors.Add(current + map_size);
+            if (current % map_size != 0 && !obstacles.Contains(current - 1))
+                neighbors.Add(current - 1);
+            if (current % map_size != map_size - 1 && !obstacles.Contains(current + 1))
+                neighbors.Add(current + 1);
 
             foreach (int neighbor in neighbors)
             {
