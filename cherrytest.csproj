@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\AstarPathfinding.cs" />
     <Compile Include="Assets\Scripts\BFSPathfinding.cs" />
+    <Compile Include="Assets\Scripts\DialogController.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Scripts\IPathfinding.cs" />
     <Compile Include="Assets\Scripts\Map.cs" />

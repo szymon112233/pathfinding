@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour {
 
     public GameObject main_camera;
-
     public float camera_move_speed = 50.0f;
     public float camera_zoom_speed = 50.0f;
 
@@ -29,7 +28,6 @@ public class GameController : MonoBehaviour {
 
         pathfinder = new BFSPathfinding();
         MainMode();
-
     }
 	
 	void Update () {
@@ -69,33 +67,30 @@ public class GameController : MonoBehaviour {
                     map.GetComponent<Map>().GenerateNewMap(size, obstacles);
                 else
                 {
-                    error_message = "Minimalny rozmiar mapy to 10x10!";
-                    OpenError();
+                    OpenError("The map must be at least 10x10");
                 }
                     
             }
             else
             {
-                error_message = "Za duzo obstacli!";
-                OpenError();
+                OpenError("Too many obstacles");
             }
         }
-        catch (System.FormatException exception)
+        catch (System.FormatException)
         {
-            error_message = "Zle wartości w polu Map size lub Obstacles count";
-            OpenError();
+            OpenError("Wrong value of Map size or Obstacles count");
         }
         CenterCamera();
     }
 
-    public void LoadMap(string filename)
+    private void LoadMap(string filename)
     {
         GameObject map = GameObject.Find("Map");
         map.GetComponent<Map>().LoadMapFromFile(filename);
         CenterCamera();
     }
 
-    public void SaveMap(string filename)
+    private void SaveMap(string filename)
     {
         GameObject map = GameObject.Find("Map");
         map.GetComponent<Map>().SaveMapToFile(filename);
@@ -155,7 +150,7 @@ public class GameController : MonoBehaviour {
         float y = 20;
         GUI.Label(new Rect(5, y, windowRect.width, 20), error_message);
 
-        if (GUI.Button(new Rect(5, y + 20, windowRect.width - 10, 20), "Kurde!"))
+        if (GUI.Button(new Rect(5, y + 20, windowRect.width - 10, 20), "Shame :("))
         {
             show_error = false;
         }
@@ -163,7 +158,7 @@ public class GameController : MonoBehaviour {
 
     void DialogWindow(int windowID)
     {
-        GUI.Label(new Rect(5, 20, windowRect.width, 20), "Wpisz nazwe pliku:");
+        GUI.Label(new Rect(5, 20, windowRect.width, 20), "Type your file name:");
         
         filename = GUI.TextField(new Rect(5, 50, windowRect.width, 20), filename);
 
@@ -178,10 +173,16 @@ public class GameController : MonoBehaviour {
             LoadMap(filename);
             show_dialog = false;
         }
+
+        if (GUI.Button(new Rect(5, 120, windowRect.width - 10, 20), "Cancel"))
+        {
+            show_dialog = false;
+        }
     }
 
-    public void OpenError()
+    public void OpenError(string message)
     {
+        error_message = message;
         show_error = true;
     }
 

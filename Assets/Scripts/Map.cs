@@ -89,6 +89,19 @@ public class Map : MonoBehaviour {
         ColorTiles();
     }
 
+    public void Findpath(IPathfinding pathfinder)
+    {
+        List<int> path = pathfinder.GetPath(a, b, tiles, map_size, obstacles);
+
+        if (path.Count == 0)
+        {
+            GameObject.Find("Controller").GetComponent<GameController>().OpenError("Unable to find a path");
+            return;
+        }
+        ColorPathTiles(path);
+        last_path = path;
+    }
+
     private void ColorTiles()
     {
         tiles[a].GetComponent<SpriteRenderer>().color = Color.green;
@@ -96,15 +109,8 @@ public class Map : MonoBehaviour {
 
         foreach (int tile in obstacles)
         {
-                tiles[tile].GetComponent<SpriteRenderer>().color = Color.black;
+            tiles[tile].GetComponent<SpriteRenderer>().color = Color.black;
         }
-    }
-
-    public void Findpath(IPathfinding pathfinder)
-    {
-        List<int> path = pathfinder.GetPath(a, b, tiles, map_size, obstacles);
-        ColorPathTiles(path);
-        last_path = path;
     }
 
     private void ColorPathTiles(List<int> path)
@@ -140,49 +146,60 @@ public class Map : MonoBehaviour {
     {
 
         Debug.Log("Loading map from :" + filename);
-        StreamReader file = File.OpenText(filename);
 
-        string line = "";
-        line = file.ReadLine();
+        try
+        {
+            StreamReader file = File.OpenText(filename);
 
-        string[] values = line.Split();
+            string line = "";
+            line = file.ReadLine();
 
-        map_size = int.Parse(values[0]);
-        tile_size = int.Parse(values[1]);
-        a = int.Parse(values[2]);
-        b = int.Parse(values[3]);
+            string[] values = line.Split();
+
+            map_size = int.Parse(values[0]);
+            tile_size = int.Parse(values[1]);
+            a = int.Parse(values[2]);
+            b = int.Parse(values[3]);
 
 
-        if (tiles != null)
+            if (tiles != null)
+                for (int i = 0; i < tiles.Length; i++)
+                {
+                    GameObject.Destroy(tiles[i]);
+                }
+            tiles = new GameObject[map_size * map_size];
+
             for (int i = 0; i < tiles.Length; i++)
             {
-                GameObject.Destroy(tiles[i]);
+                tiles[i] = Instantiate(tile_prefab, new Vector3(i % map_size * tile_size, i / map_size * tile_size, 0), Quaternion.identity);
             }
-        tiles = new GameObject[map_size * map_size];
 
-        for (int i = 0; i < tiles.Length; i++)
-        {
-            tiles[i] = Instantiate(tile_prefab, new Vector3(i % map_size * tile_size, i / map_size * tile_size, 0), Quaternion.identity);
-        }
+            line = file.ReadLine();
+            values = line.Split(' ');
 
-        line = file.ReadLine();
-        values = line.Split(' ');
-
-        obstacles.Clear();
-        foreach (string string_number in values)
-        {
-            if (string_number != "")
+            obstacles.Clear();
+            foreach (string string_number in values)
             {
-                int number = int.Parse(string_number);
-                obstacles.Add(number);
+                if (string_number != "")
+                {
+                    int number = int.Parse(string_number);
+                    obstacles.Add(number);
+                }
+
             }
-            
+
+            last_path.Clear();
+            ColorTiles();
+
+            file.Close();
         }
+        catch(System.Exception)
+        {
+            GameObject.Find("Controller").GetComponent<GameController>().OpenError("Unable to open the file!");
+            Debug.Log("Nie udalo sie otworzyc pliku!");
+            return;
 
-        last_path.Clear();
-        ColorTiles();
-
-        file.Close();
+        }
     }
 
     public Vector3 GetCenter()
