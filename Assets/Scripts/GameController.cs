@@ -44,11 +44,6 @@ public class GameController : MonoBehaviour {
         if (Input.GetKey(KeyCode.DownArrow))
             main_camera.transform.Translate(new Vector3(0, Time.deltaTime * -camera_move_speed, 0));
 
-        if (Input.GetMouseButton(1))
-        {
-            main_camera.transform.Translate(new Vector3(Time.deltaTime * camera_move_speed * Input.GetAxis("Horizontal"), Time.deltaTime * camera_move_speed * Input.GetAxis("Vertical"), 0));
-        }
-
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             MainMode();
@@ -90,12 +85,14 @@ public class GameController : MonoBehaviour {
             error_message = "Zle wartości w polu Map size lub Obstacles count";
             OpenError();
         }
+        CenterCamera();
     }
 
     public void LoadMap(string filename)
     {
         GameObject map = GameObject.Find("Map");
         map.GetComponent<Map>().LoadMapFromFile(filename);
+        CenterCamera();
     }
 
     public void SaveMap(string filename)
@@ -191,6 +188,17 @@ public class GameController : MonoBehaviour {
     public void OpenDialog()
     {
         show_dialog = true;
+    }
+
+    private void CenterCamera()
+    {
+        GameObject map = GameObject.Find("Map");
+       Vector3 center = map.GetComponent<Map>().GetCenter();
+        center.z = -10;
+        main_camera.transform.position = center;
+
+        Camera.main.orthographicSize = 1.15f * center.y;
+
     }
 
 }

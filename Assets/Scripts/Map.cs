@@ -29,6 +29,7 @@ public class Map : MonoBehaviour {
             {
                 GameObject.Destroy(tiles[i]);   
             }
+        last_path.Clear();
         // Create new tiles
         tiles = new GameObject[new_map_size * new_map_size];
         map_size = new_map_size;
@@ -45,7 +46,6 @@ public class Map : MonoBehaviour {
         do
         {   
             tmp_target = Random.Range(0, map_size * map_size - 1);
-            tiles[tmp_target].GetComponent<Tile>().SetObstacle(true);
             if (!obstacles.Contains(tmp_target))
             {
                 // Wylosuj rozmiar
@@ -85,6 +85,7 @@ public class Map : MonoBehaviour {
 
 
         // Mark obstacles, a & b point with colors
+        
         ColorTiles();
     }
 
@@ -118,8 +119,6 @@ public class Map : MonoBehaviour {
             if ( current != a && current != b)
                 tiles[current].GetComponent<SpriteRenderer>().color = Color.red;
         }
-
-        
     }
 
     public void SaveMapToFile(string filename)
@@ -176,12 +175,18 @@ public class Map : MonoBehaviour {
             {
                 int number = int.Parse(string_number);
                 obstacles.Add(number);
-                tiles[number].GetComponent<Tile>().SetObstacle(true);
             }
             
         }
+
+        last_path.Clear();
         ColorTiles();
 
         file.Close();
+    }
+
+    public Vector3 GetCenter()
+    {
+        return gameObject.transform.position + new Vector3(map_size * tile_size /2, map_size * tile_size / 2, 0);
     }
 }
