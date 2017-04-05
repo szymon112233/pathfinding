@@ -43,7 +43,8 @@ public class Map : MonoBehaviour {
 
         // Randomly place obstacles
         obstacles.Clear();
-        do
+
+        while (obstacle_number > 0)
         {   
             tmp_target = Random.Range(0, map_size * map_size - 1);
             if (!obstacles.Contains(tmp_target))
@@ -70,7 +71,7 @@ public class Map : MonoBehaviour {
                 obstacle_number--;
             }
                 
-        } while (obstacle_number > 0);
+        }
 
 
         // Randomly place start and finish point

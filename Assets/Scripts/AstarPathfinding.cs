@@ -17,7 +17,7 @@ public class AstarPathfinding : IPathfinding {
         g_costs.Add(start, 0.0f);
         Hashtable f_costs = new Hashtable();
 
-        f_costs.Add(start, heuristic(start, finish, map_size));
+        f_costs.Add(start, heuristic(start, start, finish, map_size));
 
         while (open_list.Count > 0)
         {
@@ -61,7 +61,10 @@ public class AstarPathfinding : IPathfinding {
                 parents[neighbor] = current;
 
                 g_costs[neighbor] = temp_g_cost;
-                f_costs[neighbor] = (float)g_costs[neighbor] + heuristic(neighbor, finish, map_size);
+
+                
+
+                f_costs[neighbor] = (float)g_costs[neighbor] + heuristic(neighbor, start, finish, map_size);
             }
         }
 
@@ -69,9 +72,19 @@ public class AstarPathfinding : IPathfinding {
         return new List<int>();
     }
 
-    private float heuristic(int start, int finish, int map_size)
+    private float heuristic(int current, int start, int finish, int map_size)
     {
-        return (Mathf.Abs(start / map_size - finish / map_size) + Mathf.Abs(start % map_size - finish % map_size));
+
+        int dist_current_x = current % map_size - finish % map_size;
+        int dist_current_y = current / map_size - finish / map_size;
+        int dist_start_x = start % map_size - finish % map_size;
+        int dist_start_y = start / map_size - finish / map_size;
+
+        float result = (Mathf.Abs(dist_current_x) + Mathf.Abs(dist_current_y));
+        float cross = Mathf.Abs(dist_current_x * dist_start_y - dist_start_x * dist_current_y);
+
+        result += cross * 0.001f;
+        return result;
     }
 
     private List<int> GetParentsPath(Hashtable parents, int from)
